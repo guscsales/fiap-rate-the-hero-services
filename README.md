@@ -1,1 +1,1 @@
-# Thon Services - Backend of Thon Labs
+# Rate The Hero Services

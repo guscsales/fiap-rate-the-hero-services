@@ -62,6 +62,22 @@ functions:
           method: post
     timeout: 3600
 
+  get-hero-by-slug:
+    handler: src/domains/heroes/apis/heroes/index.getHeroBySlug
+    description: Returns a hero by slug
+    events:
+      - http:
+          path: /heroes/slug/{slug}
+          method: get
+
+  search-hero:
+    handler: src/domains/heroes/apis/heroes/index.search
+    description: Returns a list of heroes by search parameters
+    events:
+      - http:
+          path: /heroes/search
+          method: get
+
   # USER HERO RATE
   create-user-hero-rate:
     handler: src/domains/user-hero-rates/apis/user-hero-rates/index.createUserHeroRate

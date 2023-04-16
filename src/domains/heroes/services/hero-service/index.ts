@@ -128,10 +128,48 @@ const getHeroByIdSchemaValidator = schemaValidator({
     .required('You must send the ID'),
 });
 
+export interface GetHeroBySlugRequest {
+  slug: string;
+}
+
+async function getHeroBySlug(
+  { slug }: GetHeroBySlugRequest,
+  { noValidation }: ServicesOptionals = {},
+) {
+  const heroData = await DatabaseService.instance(async (prisma) =>
+    prisma.hero.findUnique({ where: { slug } }),
+  );
+
+  if (!heroData) {
+    if (!noValidation) {
+      throw new ServiceError({
+        statusCode: StatusCodes.NotFound,
+        error: HeroValidationErrors.NotFound,
+      });
+    }
+
+    return null;
+  }
+
+  return heroData;
+}
+
+const getHeroBySlugSchemaValidator = schemaValidator({
+  body: yup
+    .object()
+    .nullable()
+    .shape({
+      slug: yup.string().required('Slug is a required field'),
+    })
+    .required('You must send the Slug'),
+});
+
 const HeroService = {
   dumpData,
   getHeroById,
   getHeroByIdSchemaValidator,
+  getHeroBySlug,
+  getHeroBySlugSchemaValidator,
 };
 
 export default HeroService;

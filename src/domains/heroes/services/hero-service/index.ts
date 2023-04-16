@@ -1,6 +1,12 @@
+import { HeroValidationErrors } from '@domains/heroes/enums/hero-validation-errors';
+import { StatusCodes } from '@domains/shared/enums/status-codes';
 import normalizeString from '@domains/shared/helpers/normalize-string';
+import { schemaValidator } from '@domains/shared/middleware/schema-validator';
+import { ServicesOptionals } from '@domains/shared/models/services-optionals';
 import DatabaseService from '@domains/shared/services/database-service';
+import { ServiceError } from '@domains/shared/services/service-error';
 import axios from 'axios';
+import * as yup from 'yup';
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -86,8 +92,46 @@ async function dumpData() {
   console.log('Dump ended');
 }
 
+export interface GetHeroByIdRequest {
+  id: number;
+}
+
+async function getHeroById(
+  { id }: GetHeroByIdRequest,
+  { noValidation }: ServicesOptionals = {},
+) {
+  const heroData = await DatabaseService.instance(async (prisma) =>
+    prisma.hero.findFirst({ where: { id } }),
+  );
+
+  if (!heroData) {
+    if (!noValidation) {
+      throw new ServiceError({
+        statusCode: StatusCodes.NotFound,
+        error: HeroValidationErrors.NotFound,
+      });
+    }
+
+    return null;
+  }
+
+  return heroData;
+}
+
+const getHeroByIdSchemaValidator = schemaValidator({
+  body: yup
+    .object()
+    .nullable()
+    .shape({
+      id: yup.number().required('ID is a required field'),
+    })
+    .required('You must send the ID'),
+});
+
 const HeroService = {
   dumpData,
+  getHeroById,
+  getHeroByIdSchemaValidator,
 };
 
 export default HeroService;

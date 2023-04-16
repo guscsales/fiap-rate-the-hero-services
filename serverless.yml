@@ -61,3 +61,40 @@ functions:
           path: /heroes/dump-data
           method: post
     timeout: 3600
+
+  # USER HERO RATE
+  create-user-hero-rate:
+    handler: src/domains/user-hero-rates/apis/user-hero-rates/index.createUserHeroRate
+    description: Create a new user hero rate
+    events:
+      - http:
+          path: /user-hero-rates
+          method: post
+          cors: true
+
+  update-user-hero-rate:
+    handler: src/domains/user-hero-rates/apis/user-hero-rates/index.updateUserHeroRate
+    description: Update an user hero rate
+    events:
+      - http:
+          path: /user-hero-rates/{id}
+          method: put
+          cors: true
+
+  get-user-hero-rate-by-id:
+    handler: src/domains/user-hero-rates/apis/user-hero-rates/index.getUserHeroRateById
+    description: Returns an user hero rate by id
+    events:
+      - http:
+          path: /user-hero-rates/{id}
+          method: get
+          cors: true
+
+  delete-user-hero-rate-by-id:
+    handler: src/domains/user-hero-rates/apis/user-hero-rates/index.deleteUserHeroRateById
+    description: Deletes an user hero rate by id
+    events:
+      - http:
+          path: /user-hero-rates/{id}
+          method: delete
+          cors: true

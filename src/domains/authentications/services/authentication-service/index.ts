@@ -73,7 +73,7 @@ async function login(payload: LoginRequest): Promise<Session> {
   }
 
   const session = await await signToken(
-    { sub: userData.id, ...payload },
+    { sub: userData.id, userId: userData.id, ...payload },
     3600, // 1 hour
   );
 

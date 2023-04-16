@@ -1,0 +1,43 @@
+service: sls-thon-services
+
+frameworkVersion: '2 || 3'
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-webpack
+  - serverless-webpack-prisma
+  - serverless-offline
+
+custom:
+  tscpaths:
+  webpack:
+    includeModules: true
+    packager: 'yarn'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  memorySize: 128
+  timeout: 5
+  apiGateway:
+    binaryMediaTypes:
+      - 'multipart/form-data'
+
+functions:
+  get-session:
+    handler: src/domains/authentications/apis/authentication/index.getSession
+    description: Returns the current session from token
+    events:
+      - http:
+          path: /authentications/session
+          method: get
+          cors: true
+
+  login:
+    handler: src/domains/authentications/apis/authentication/index.login
+    description: Login using email and password
+    events:
+      - http:
+          path: /authentications/login
+          method: post
+          cors: true

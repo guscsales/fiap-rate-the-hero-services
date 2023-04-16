@@ -1,0 +1,38 @@
+{
+  "root": true,
+  "ignorePatterns": ["**/*"],
+  "plugins": ["prettier"],
+  "extends": ["prettier"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "extends": ["airbnb-typescript"],
+      "parserOptions": {
+        "project": ["tsconfig.base.json"]
+      }
+    },
+    {
+      "files": ["*.ts",  "*.js"],
+      "rules": {
+        "prettier/prettier": [
+          1,
+          {
+            "singleQuote": true,
+            "tabWidth": 2,
+            "trailingComma": "all",
+            "endOfLine": "auto"
+          }
+        ],
+        "no-console": 2,
+        "import/no-extraneous-dependencies": 0,
+        "@typescript-eslint/no-shadow": 0,
+        "@typescript-eslint/indent": 0,
+        "@typescript-eslint/quotes": [
+          2,
+          "single",
+          { "avoidEscape": true, "allowTemplateLiterals": true }
+        ]
+      }
+    }
+  ]
+}

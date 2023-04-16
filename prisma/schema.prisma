@@ -1,0 +1,64 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+enum UserType {
+  Admin
+  Common
+}
+
+model User {
+  // Tipo: uuid (hash único)
+  id       String   @id @default(uuid())
+  email    String   @unique
+  password String
+  userType UserType
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userHeroRate UserHeroRate[]
+}
+
+model Hero {
+  id              String   @id @default(uuid())
+  name            String
+  fullName        String
+  placeOfBirth    String
+  universe        String
+  firstAppearance String
+  combat          String
+  durability      String
+  intelligence    String
+  power           String
+  speed           String
+  strength        String
+  eyeColor        String
+  gender          String
+  hairColor       String
+  race            String
+  height          String[]
+  weight          String[]
+
+  userHeroRate UserHeroRate[]
+}
+
+model UserHeroRate {
+  // Tipo: auto incremento
+  id         Int @id @default(autoincrement())
+  assessment Int
+
+  createdAt DateTime @default(now())
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  Hero   Hero?   @relation(fields: [heroId], references: [id])
+  heroId String?
+}

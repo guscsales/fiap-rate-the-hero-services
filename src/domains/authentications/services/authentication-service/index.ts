@@ -9,8 +9,9 @@ import * as yup from 'yup';
 import { generateHashedValue } from '@domains/shared/helpers/generate-hashed-value';
 import { Session } from '@domains/authentications/models/session';
 import DatabaseService from '@domains/shared/services/database-service';
-import { UserType } from '@prisma/client';
+import { User, UserType } from '@prisma/client';
 import { signToken } from '@domains/authentications/helpers/sign-token';
+import UserService from '@domains/users/services/user-service';
 
 async function isValidToken(token: string): Promise<boolean> {
   const openedToken = getDataFromToken(token);
@@ -29,8 +30,10 @@ async function isValidToken(token: string): Promise<boolean> {
   }
 
   // Validate sub
-  // TODO: implement user logic
-  let isTokenValid = true;
+  let isTokenValid = !!(await UserService.getUserById(
+    { id: sub },
+    { noValidation: true },
+  ));
 
   // Validate expiration time
   const currentDate = new Date();
@@ -52,35 +55,15 @@ function getSession(token: string): JwtPayload {
   }
 }
 
-interface GenerateTokenRequest {
-  id: string;
-  userType: UserType;
-  email: string;
-}
-
-async function generateToken({ id, ...payload }: GenerateTokenRequest) {
-  // Generate token
-  const session = await signToken(
-    { sub: id, ...payload },
-    600, // 10 minutes
-  );
-
-  return session;
-}
-
 export interface LoginRequest {
   email: string;
   password: string;
 }
 
-async function login({ email, password }: LoginRequest): Promise<Session> {
-  const hashedPassword = generateHashedValue(password);
-
-  const userData = await DatabaseService.instance(async (prisma) =>
-    prisma.user.findFirst({
-      where: { email, password: hashedPassword },
-    }),
-  );
+async function login(payload: LoginRequest): Promise<Session> {
+  const userData = await UserService.getUserByEmailAndPassword(payload, {
+    noValidation: true,
+  });
 
   if (!userData) {
     throw new ServiceError({
@@ -89,7 +72,10 @@ async function login({ email, password }: LoginRequest): Promise<Session> {
     });
   }
 
-  const session = await generateToken(userData);
+  const session = await await signToken(
+    { sub: userData.id, ...payload },
+    600, // 10 minutes
+  );
 
   return {
     token: session.token,
@@ -108,11 +94,40 @@ const loginSchemaValidator = schemaValidator({
     .required('You must send the Email and Password'),
 });
 
+export interface SignUpCommonUserRequest {
+  email: string;
+  password: string;
+}
+
+async function signUpCommonUser({
+  email,
+  password,
+}: SignUpCommonUserRequest): Promise<Session> {
+  await UserService.createCommonUser({ user: { email, password } as User });
+
+  const session = await login({ email, password });
+
+  return session;
+}
+
+const signUpCommonUserSchemaValidator = schemaValidator({
+  body: yup
+    .object()
+    .nullable()
+    .shape({
+      email: yup.string().email().required('Email is a required field'),
+      password: yup.string().required('Password is a required field'),
+    })
+    .required('You must send the Email and Password'),
+});
+
 const AuthenticationService = {
   isValidToken,
   getSession,
   login,
   loginSchemaValidator,
+  signUpCommonUser,
+  signUpCommonUserSchemaValidator,
 };
 
 export default AuthenticationService;

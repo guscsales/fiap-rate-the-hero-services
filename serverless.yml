@@ -24,6 +24,7 @@ provider:
       - 'multipart/form-data'
 
 functions:
+  # AUTHENTICATION
   get-session:
     handler: src/domains/authentications/apis/authentication/index.getSession
     description: Returns the current session from token
@@ -39,5 +40,14 @@ functions:
     events:
       - http:
           path: /authentications/login
+          method: post
+          cors: true
+
+  sign-up-common-user:
+    handler: src/domains/authentications/apis/authentication/index.signUpCommonUser
+    description: Creates a new common user
+    events:
+      - http:
+          path: /authentications/sign-up
           method: post
           cors: true

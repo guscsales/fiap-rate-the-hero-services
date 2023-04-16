@@ -1,6 +1,7 @@
 import { getAuthorizationHeaders } from '@domains/authentications/helpers/get-authorization-headers';
 import AuthenticationService, {
   LoginRequest,
+  SignUpCommonUserRequest,
 } from '@domains/authentications/services/authentication-service';
 import { StatusCodes } from '@domains/shared/enums/status-codes';
 import { coreMiddleware } from '@domains/shared/middleware';
@@ -31,3 +32,17 @@ export const login = middy(async ({ body }: ApiRequest<LoginRequest>) => {
 })
   .use(coreMiddleware({ requireTokenValidator: false }))
   .use(AuthenticationService.loginSchemaValidator);
+
+export const signUpCommonUser = middy(
+  async ({ body }: ApiRequest<SignUpCommonUserRequest>) => {
+    try {
+      const data = await AuthenticationService.signUpCommonUser(body);
+
+      return response(StatusCodes.OK, { data });
+    } catch ({ statusCode, error }) {
+      return response(statusCode, { error });
+    }
+  },
+)
+  .use(coreMiddleware({ requireTokenValidator: false }))
+  .use(AuthenticationService.signUpCommonUserSchemaValidator);

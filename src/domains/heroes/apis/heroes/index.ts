@@ -2,7 +2,9 @@ import { StatusCodes } from '@domains/shared/enums/status-codes';
 import { coreMiddleware } from '@domains/shared/middleware';
 import response from '@domains/shared/services/response';
 import middy from '@middy/core';
-import HeroService from '@domains/heroes/services/hero-service/index';
+import HeroService, {
+  SearchHeroesRequest,
+} from '@domains/heroes/services/hero-service/index';
 import { ApiRequest } from '@domains/shared/models/api-request';
 
 export const dumpData = middy(async () => {
@@ -28,15 +30,23 @@ export const getHeroBySlug = middy(async ({ pathParameters }: ApiRequest) => {
     return response(statusCode, { error });
   }
 })
-  .use(coreMiddleware())
+  .use(coreMiddleware({ requireTokenValidator: false }))
   .use(HeroService.getHeroBySlugSchemaValidator);
 
-export const search = middy(async ({ queryStringParameters }: ApiRequest) => {
-  try {
-    return response(StatusCodes.OK);
-  } catch ({ statusCode, error }) {
-    return response(statusCode, { error });
-  }
-})
-  .use(coreMiddleware())
-  .use(HeroService.getHeroByIdSchemaValidator);
+export const search = middy(
+  async ({
+    queryStringParameters: searchParams,
+  }: ApiRequest<SearchHeroesRequest>) => {
+    try {
+      const results = await HeroService.searchHeroes(
+        searchParams as unknown as SearchHeroesRequest,
+      );
+
+      return response(StatusCodes.OK, results);
+    } catch ({ statusCode, error }) {
+      return response(statusCode, { error });
+    }
+  },
+)
+  .use(coreMiddleware({ requireTokenValidator: false }))
+  .use(HeroService.searchHeroesSchemaValidator);

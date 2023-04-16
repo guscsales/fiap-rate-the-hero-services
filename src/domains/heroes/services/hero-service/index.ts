@@ -5,6 +5,7 @@ import { schemaValidator } from '@domains/shared/middleware/schema-validator';
 import { ServicesOptionals } from '@domains/shared/models/services-optionals';
 import DatabaseService from '@domains/shared/services/database-service';
 import { ServiceError } from '@domains/shared/services/service-error';
+import { Hero, Prisma } from '@prisma/client';
 import axios from 'axios';
 import * as yup from 'yup';
 
@@ -164,12 +165,69 @@ const getHeroBySlugSchemaValidator = schemaValidator({
     .required('You must send the Slug'),
 });
 
+export interface SearchHeroesRequest {
+  q: string;
+  limit: string;
+}
+
+const searchHeroesDefaultParams: Omit<SearchHeroesRequest, 'q'> = {
+  limit: '50',
+};
+
+async function searchHeroes({ q, ...params }: SearchHeroesRequest) {
+  const { limit } = { ...searchHeroesDefaultParams, ...params };
+
+  const limitParam = parseInt(limit);
+
+  const where = {
+    OR: [
+      { name: { contains: q, mode: 'insensitive' } },
+      { secretIdentity: { contains: q, mode: 'insensitive' } },
+      { placeOfBirth: { contains: q, mode: 'insensitive' } },
+      { universe: { contains: q, mode: 'insensitive' } },
+    ],
+  } as Prisma.HeroWhereInput;
+
+  const totalResults = await DatabaseService.instance(async (prisma) =>
+    prisma.hero.count({
+      where,
+    }),
+  );
+
+  let items: Hero[] = [];
+
+  if (totalResults > 0) {
+    items = await DatabaseService.instance(async (prisma) =>
+      prisma.hero.findMany({
+        where,
+        orderBy: { secretIdentity: 'asc' },
+        take: limitParam,
+      }),
+    );
+  }
+
+  return { items, totalResults, limit: limitParam };
+}
+
+const searchHeroesSchemaValidator = schemaValidator({
+  body: yup
+    .object()
+    .nullable()
+    .shape({
+      q: yup.string().required('Search value is a required field'),
+      limit: yup.number().nullable(),
+    })
+    .required(),
+});
+
 const HeroService = {
   dumpData,
   getHeroById,
   getHeroByIdSchemaValidator,
   getHeroBySlug,
   getHeroBySlugSchemaValidator,
+  searchHeroes,
+  searchHeroesSchemaValidator,
 };
 
 export default HeroService;

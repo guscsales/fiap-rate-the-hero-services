@@ -7,7 +7,6 @@
 /.build
 /.serverless
 /.webpack
-/data
 
 # dependencies
 node_modules

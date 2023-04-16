@@ -1,3 +1,4 @@
+import normalizeString from '@domains/shared/helpers/normalize-string';
 import DatabaseService from '@domains/shared/services/database-service';
 import axios from 'axios';
 
@@ -26,7 +27,7 @@ async function dumpData() {
         const heroExists = await DatabaseService.instance(async (prisma) =>
           prisma.hero.count({
             where: {
-              originalId: parseInt(hero.id),
+              id: parseInt(hero.id),
             },
           }),
         );
@@ -37,32 +38,40 @@ async function dumpData() {
         }
 
         console.log(`Hero "${hero.name} (${hero.id})" found`);
-
-        await DatabaseService.instance(async (prisma) =>
-          prisma.hero.create({
-            data: {
-              originalId: parseInt(hero?.id),
-              name: hero?.name,
-              secretIdentity: hero?.biography?.['full-name'],
-              placeOfBirth: hero?.biography?.['place-of-birth'],
-              universe: hero?.biography?.publisher,
-              firstAppearance: hero?.biography?.['first-appearance'],
-              pictureURL: hero?.image?.url,
-              combat: hero?.powerstats?.combat,
-              durability: hero?.powerstats?.durability,
-              intelligence: hero?.powerstats?.intelligence,
-              power: hero?.powerstats?.power,
-              speed: hero?.powerstats?.speed,
-              strength: hero?.powerstats?.strength,
-              eyeColor: hero?.appearance?.['eye-color'],
-              hairColor: hero?.appearance?.['hair-color'],
-              race: hero?.appearance?.race,
-              height: hero?.appearance?.height || [],
-              weight: hero?.appearance?.weight || [],
-              gender: hero?.appearance?.gender,
-            },
-          }),
-        );
+        try {
+          await DatabaseService.instance(async (prisma) =>
+            prisma.hero.create({
+              data: {
+                id: parseInt(hero?.id),
+                slug: `${normalizeString(hero?.name)}${
+                  hero?.biography?.['full-name']
+                    ? `-${normalizeString(hero?.biography?.['full-name'])}`
+                    : ''
+                }`,
+                name: hero?.name,
+                secretIdentity: hero?.biography?.['full-name'],
+                placeOfBirth: hero?.biography?.['place-of-birth'],
+                universe: hero?.biography?.publisher,
+                firstAppearance: hero?.biography?.['first-appearance'],
+                pictureURL: hero?.image?.url,
+                combat: hero?.powerstats?.combat,
+                durability: hero?.powerstats?.durability,
+                intelligence: hero?.powerstats?.intelligence,
+                power: hero?.powerstats?.power,
+                speed: hero?.powerstats?.speed,
+                strength: hero?.powerstats?.strength,
+                eyeColor: hero?.appearance?.['eye-color'],
+                hairColor: hero?.appearance?.['hair-color'],
+                race: hero?.appearance?.race,
+                height: hero?.appearance?.height || [],
+                weight: hero?.appearance?.weight || [],
+                gender: hero?.appearance?.gender,
+              },
+            }),
+          );
+        } catch (e) {
+          console.log(e);
+        }
 
         console.log('Added to database');
       }

@@ -27,8 +27,8 @@ model User {
 }
 
 model Hero {
-  id              String   @id @default(uuid())
-  originalId      Int      @unique
+  id              Int      @unique
+  slug            String   @unique
   name            String?
   secretIdentity  String?
   placeOfBirth    String?
@@ -63,6 +63,6 @@ model UserHeroRate {
   User   User?   @relation(fields: [userId], references: [id])
   userId String?
 
-  Hero   Hero?   @relation(fields: [heroId], references: [id])
-  heroId String?
+  Hero   Hero? @relation(fields: [heroId], references: [id])
+  heroId Int?
 }

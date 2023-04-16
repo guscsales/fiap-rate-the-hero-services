@@ -51,3 +51,13 @@ functions:
           path: /authentications/sign-up
           method: post
           cors: true
+
+  # HEROES
+  dump-heroes-data:
+    handler: src/domains/heroes/apis/heroes/index.dumpData
+    description: Dump the data from Superhero API
+    events:
+      - http:
+          path: /heroes/dump-data
+          method: post
+    timeout: 3600

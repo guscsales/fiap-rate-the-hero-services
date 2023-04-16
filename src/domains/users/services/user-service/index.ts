@@ -20,9 +20,6 @@ async function getUserById(
     async (prisma) =>
       prisma.user.findFirst({
         where: { id },
-        select: {
-          password: false,
-        },
       }) as unknown as Omit<User, 'password'>,
   );
 

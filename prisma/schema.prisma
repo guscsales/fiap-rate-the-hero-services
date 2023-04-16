@@ -28,23 +28,27 @@ model User {
 
 model Hero {
   id              String   @id @default(uuid())
-  name            String
-  fullName        String
-  placeOfBirth    String
-  universe        String
-  firstAppearance String
-  combat          String
-  durability      String
-  intelligence    String
-  power           String
-  speed           String
-  strength        String
-  eyeColor        String
-  gender          String
-  hairColor       String
-  race            String
+  originalId      Int      @unique
+  name            String?
+  secretIdentity  String?
+  placeOfBirth    String?
+  universe        String?
+  firstAppearance String?
+  pictureURL      String?
+  combat          String?
+  durability      String?
+  intelligence    String?
+  power           String?
+  speed           String?
+  strength        String?
+  eyeColor        String?
+  gender          String?
+  hairColor       String?
+  race            String?
   height          String[]
   weight          String[]
+
+  createdAt DateTime @default(now())
 
   userHeroRate UserHeroRate[]
 }

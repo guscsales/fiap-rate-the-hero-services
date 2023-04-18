@@ -1,0 +1,276 @@
+{
+	"info": {
+		"_postman_id": "ab16c400-d108-4de9-acca-d7e64d8f9152",
+		"name": "[FIAP] Rate The Hero",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18825863"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"gustavo@gsales.io\",\n    \"password\": \"12345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/authentications/login",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"authentications",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign Up User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"gustavo@gsales.io\",\n    \"password\": \"12345678\",\n    \"confirmPassword\": \"123456789\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/authentications/sign-up",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"authentications",
+								"sign-up"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Heroes",
+			"item": [
+				{
+					"name": "Dump Heroes Data",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/heroes/dump-data",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"heroes",
+								"dump-data"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Hero By Slug",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/heroes/slug/batman-bruce-wayne",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"heroes",
+								"slug",
+								"batman-bruce-wayne"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Heroes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/heroes/search?q=captain",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"heroes",
+								"search"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "q",
+									"value": "captain"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Hero Rate",
+			"item": [
+				{
+					"name": "Create User Hero Rate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"heroId\": 1,\n    \"assessment\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/user-hero-rates",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"user-hero-rates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Hero Rate",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"assessment\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/user-hero-rates/1",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"user-hero-rates",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Hero Rate By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/user-hero-rates/1",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"user-hero-rates",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User Hero Rate By ID",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/user-hero-rates/1",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"user-hero-rates",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

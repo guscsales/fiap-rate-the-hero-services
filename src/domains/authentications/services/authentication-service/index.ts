@@ -97,12 +97,21 @@ const loginSchemaValidator = schemaValidator({
 export interface SignUpCommonUserRequest {
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
 async function signUpCommonUser({
   email,
   password,
+  confirmPassword,
 }: SignUpCommonUserRequest): Promise<Session> {
+  if (password !== confirmPassword) {
+    throw new ServiceError({
+      statusCode: StatusCodes.NotAcceptable,
+      error: AuthenticationValidationErrors.PasswordMismatch,
+    });
+  }
+
   await UserService.createCommonUser({ user: { email, password } as User });
 
   const session = await login({ email, password });

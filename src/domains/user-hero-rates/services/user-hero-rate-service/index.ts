@@ -44,6 +44,82 @@ const getUserHeroRateByIdSchemaValidator = schemaValidator({
     .required('You must send the ID'),
 });
 
+export interface GetUserHeroRateByHeroIdRequest {
+  userId: string;
+  heroId: number;
+}
+
+async function getUserHeroRateByHeroId(
+  { heroId, userId }: GetUserHeroRateByHeroIdRequest,
+  { noValidation }: ServicesOptionals = {},
+) {
+  const data = await DatabaseService.instance(async (prisma) =>
+    prisma.userHeroRate.findFirst({
+      select: {
+        id: true,
+        assessment: true,
+      },
+      where: { heroId, userId },
+    }),
+  );
+
+  if (!data) {
+    if (!noValidation) {
+      throw new ServiceError({
+        statusCode: StatusCodes.NotFound,
+        error: UserHeroRateValidationErrors.NotFound,
+      });
+    }
+
+    return null;
+  }
+
+  return data;
+}
+
+const getUserHeroRateByHeroIdSchemaValidator = schemaValidator({
+  body: yup
+    .object()
+    .nullable()
+    .shape({
+      heroId: yup.string().required('Hero ID is a required field'),
+    })
+    .required(),
+});
+
+export interface FetchUserHeroRatesRequest {
+  userId: string;
+}
+
+async function fetchUserHeroRates(
+  { userId }: FetchUserHeroRatesRequest,
+  { noValidation }: ServicesOptionals = {},
+) {
+  const data = await DatabaseService.instance(async (prisma) =>
+    prisma.userHeroRate.findMany({
+      select: {
+        id: true,
+        assessment: true,
+        heroId: true,
+      },
+      where: { userId },
+    }),
+  );
+
+  if (!data) {
+    if (!noValidation) {
+      throw new ServiceError({
+        statusCode: StatusCodes.NotFound,
+        error: UserHeroRateValidationErrors.NotFound,
+      });
+    }
+
+    return null;
+  }
+
+  return data;
+}
+
 export interface CreateUserHeroRateRequest {
   userId: string;
   heroId: number;
@@ -72,6 +148,8 @@ async function createUserHeroRate(payload: CreateUserHeroRateRequest) {
     prisma.userHeroRate.create({
       data: {
         assessment: payload.assessment,
+        userId,
+        heroId,
       },
     }),
   );
@@ -171,6 +249,9 @@ const UserHeroRateService = {
   updateUserHeroRateSchemaValidator,
   deleteUserHeroRateById,
   deleteUserHeroRateByIdSchemaValidator,
+  getUserHeroRateByHeroId,
+  getUserHeroRateByHeroIdSchemaValidator,
+  fetchUserHeroRates,
 };
 
 export default UserHeroRateService;

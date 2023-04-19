@@ -97,9 +97,18 @@ functions:
           method: put
           cors: true
 
+  fetch-user-hero-rates:
+    handler: src/domains/user-hero-rates/apis/user-hero-rates/index.fetchUserHeroRates
+    description: Returns all user hero rates according user token
+    events:
+      - http:
+          path: /user-hero-rates
+          method: get
+          cors: true
+
   get-user-hero-rate-by-id:
     handler: src/domains/user-hero-rates/apis/user-hero-rates/index.getUserHeroRateById
-    description: Returns an user hero rate by id
+    description: Returns an user hero rate by id according user token
     events:
       - http:
           path: /user-hero-rates/{id}
@@ -113,4 +122,13 @@ functions:
       - http:
           path: /user-hero-rates/{id}
           method: delete
+          cors: true
+
+  get-user-hero-rate-by-hero-id:
+    handler: src/domains/user-hero-rates/apis/user-hero-rates/index.getUserHeroRateByHeroId
+    description: Returns an user hero rate by hero id
+    events:
+      - http:
+          path: /user-hero-rates/heroes/{heroId}
+          method: get
           cors: true

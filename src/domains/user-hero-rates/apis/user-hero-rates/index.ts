@@ -16,6 +16,7 @@ export const createUserHeroRate = middy(
       const { userId } = getDataFromToken(
         getAuthorizationHeaders(headers).token,
       );
+
       const data = await UserHeroRateService.createUserHeroRate({
         ...body,
         userId,
@@ -101,3 +102,42 @@ export const deleteUserHeroRateById = middy(
 )
   .use(coreMiddleware())
   .use(UserHeroRateService.deleteUserHeroRateByIdSchemaValidator);
+
+export const getUserHeroRateByHeroId = middy(
+  async ({ pathParameters, headers }: ApiRequest) => {
+    try {
+      const { heroId } = pathParameters as unknown as { heroId: string };
+
+      if (!heroId || heroId === 'undefined') {
+        return response(StatusCodes.BadRequest);
+      }
+
+      const { userId } = getDataFromToken(
+        getAuthorizationHeaders(headers).token,
+      );
+      const data = await UserHeroRateService.getUserHeroRateByHeroId({
+        heroId: parseInt(heroId),
+        userId,
+      });
+
+      return response(StatusCodes.OK, { data });
+    } catch ({ statusCode, error }) {
+      return response(statusCode, { error });
+    }
+  },
+)
+  .use(coreMiddleware())
+  .use(UserHeroRateService.getUserHeroRateByHeroIdSchemaValidator);
+
+export const fetchUserHeroRates = middy(async ({ headers }: ApiRequest) => {
+  try {
+    const { userId } = getDataFromToken(getAuthorizationHeaders(headers).token);
+    const items = await UserHeroRateService.fetchUserHeroRates({
+      userId,
+    });
+
+    return response(StatusCodes.OK, { items });
+  } catch ({ statusCode, error }) {
+    return response(statusCode, { error });
+  }
+}).use(coreMiddleware());
